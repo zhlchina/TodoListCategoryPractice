@@ -7,12 +7,28 @@
 //
 
 import UIKit
+import CoreData
 
 class CatTableViewController: UITableViewController {
 
+    var categoryArray=[Category]()
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+         print("View did load")
+        let newCategory = Category(context: context)
+         print("newCategory Declared")
+        newCategory.title = "This is a new category \(arc4random_uniform(100))"
+         print("newCategory Title Set")
+//        categoryArray.append(newCategory)
+//         print("New category appended to Category array")
+        
+        saveData()
+        loadData()
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -28,25 +44,63 @@ class CatTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
+        
+       
         // #warning Incomplete implementation, return the number of sections
-        return 0
+      return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+         return categoryArray.count
     }
 
-    /*
+   
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CatCell", for: indexPath)
+        cell.textLabel?.text = categoryArray[indexPath.row].title
         // Configure the cell...
 
         return cell
     }
-    */
-
+    
+    @IBAction func firstbuttonPressed(_ sender: UIButton) {
+        print("button pressed")
+//      context.delete(categoryArray[categoryArray.count-1])
+        categoryArray[categoryArray.count-2].title="this this the 2nd last"
+        for eachItem in categoryArray{
+            context.delete(eachItem)
+        }
+        saveData()
+        loadData()
+    }
+    
+    
+    //MARK: - Data manipulation
+    func loadData(){
+        let requst : NSFetchRequest<Category> = Category.fetchRequest()
+        do {
+             print("Load Data Get called")
+            categoryArray = try context.fetch(requst)
+            tableView.reloadData()
+            print("data fetched")
+        } catch{
+            print(error)
+        }
+    }
+    
+    func saveData(){
+        do {
+             print("saveData get called")
+            try context.save()
+            print(context)
+            tableView.reloadData()
+            print("data saved")
+        } catch {
+            print("Saving Data error \(error)")
+        }
+       
+    }
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
